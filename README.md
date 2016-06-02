@@ -1,2 +1,43 @@
 # move_deactivated_servers
-Moves deactivated servers in Halo to a specified group based on number of days deactivated
+
+This Python script will move deactivated servers contained in the
+Halo Group tree scope of the API Key specified into a specified
+group based on number of days the server has been in a deactivated
+state.
+
+This will help cloud forward customers with highly elastic environments
+keep there active server groups clean. Also this will allow for the issues
+per group reports to contain information for only active or recently
+deactivated servers and prevent reporting on systems that are no longer
+online or active.
+
+IMPORTANT:
+This script was built for Python 2.7.11 or later and requires an OpenSSL
+version compatible with TLS1.2 or newer
+Check python OpenSSL version
+>python
+>>> import ssl
+>>> ssl.OPENSSL_VERSION
+'OpenSSL 1.0.2g  1 Mar 2016'
+
+
+Python Module Prerequisites:
+This script requires the following Python modules:
+json, base64, datetime, sys, argparse, pytz, requests, iso8601
+Use PIP to install these if you are encountering errors for missing modules
+for pytz, requests, iso8601
+   > pip install requests, pytz, iso8601
+
+The script takes advantage of the new server field last_state_change and
+is intended to be run from cron on a restricted-access tools server or
+bastion box once daily.  Since last_state_change is only expressed in whole
+days after a server has been offline for more than 24 hours, there is little
+advantage to running it more often.
+
+You will need a config.py file that includes your API key and secret key
+-- see the sample file. The keypair must have full access (read-write), and
+as always, you will want to protect the security
+
+By default, servers that have been deactivated for more than 7 days will be
+moved by the script to the specified group. To change this, modify the value
+of deactivate_num_days in the config.py file.
