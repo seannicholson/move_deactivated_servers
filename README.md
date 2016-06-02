@@ -17,7 +17,9 @@ version compatible with TLS1.2 or newer
 Check python OpenSSL version
 
   >python
+
   >then run "import ssl"
+
   >then run "ssl.OPENSSL_VERSION"
 
 Should show something similar to:
