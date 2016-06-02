@@ -16,7 +16,9 @@ This script was built for Python 2.7.11 or later and requires an OpenSSL
 version compatible with TLS1.2 or newer
 Check python OpenSSL version
 
-python, then run import ssl, then run ssl.OPENSSL_VERSION
+python
+then run "import ssl"
+then run "ssl.OPENSSL_VERSION"
 
 Should show something similar to:
 'OpenSSL 1.0.2g  1 Mar 2016'
