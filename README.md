@@ -6,7 +6,7 @@ group based on number of days the server has been in a deactivated
 state.
 
 This will help cloud forward customers with highly elastic environments
-keep there active server groups clean. Also this will allow for the issues
+keep their active server groups clean. Also this will allow for the issues
 per group reports to contain information for only active or recently
 deactivated servers and prevent reporting on systems that are no longer
 online or active.
