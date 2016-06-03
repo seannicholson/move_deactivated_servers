@@ -1,4 +1,4 @@
-# move_deactivated_servers
+# move_deactivated_servers_multi_api_keys
 
 This Python script will move deactivated servers contained in the
 Halo Group tree scope of the API Key specified into a specified
