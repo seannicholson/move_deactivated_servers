@@ -1,22 +1,11 @@
 
 #*******************  Variables  **********************
-# clientid:         API key
-# clientsecret:     API secret
 # apiurl            Halo API URL
-# moveToGroup       Server Group to move deactivated servers to
-# moveToGroupID     Server Group ID in hex format
-# retire_num_days   Number of days that a server has to be deactivated for
-#******************************************************
-
-#******************************************************
-# IMPORTANT:
-#   Ensure the group you want to move to is within the scope
-#   of the API Key specified
-#******************************************************
-#clientID     = '1234ABCD'
-#clientSecret = '050732791334f4a04c9ab64d572625d7'
-clientID     = ''
-clientSecret = ''
+# api_keys_path     Path to api_keys.txt file
+# moveToGroup       Server Group to move deactivated
+#                   servers to
+# retire_num_days   Number of days that a server has to
+#                   be deactivated for
 #******************************************************
 
 #******************************************************
@@ -26,16 +15,17 @@ apiurl = 'https://api.cloudpassage.com'
 #******************************************************
 
 #******************************************************
+# Default value ./api_keys.txt, change to path of
+# api_keys file if not stored in same directory as
+# the script files
+api_keys_path = './api_keys.txt'
+#******************************************************
+
+#******************************************************
 # Specify name of group to move deactivated servers to
 # IMPORTANT: Must be exact name match
 # moveToGroupName  = 'X-Deactivated Servers'
 moveToGroupName  = ''
-#******************************************************
-#******************************************************
-# Specify group ID if known
-# (uuid format 0123456789ABCDE0123456789ABCDE)
-# Leave moveToGroupID blank if not known
-moveToGroupID = ''
 #******************************************************
 
 #******************************************************

@@ -1,14 +1,16 @@
 ###############################################################################
 # Import statements
 # This script requires the following Python modules
-# json, base64, datetime, sys, argparse
+# json, base64, requests, datetime, sys, argparse, pytz, iso8601, os, os.path
 # use PIP import for these if you are encountering errors for pytz, requests,
 # iso8601
 #   > pip install requests, pytz, iso8601
 #
 
 import json, base64, requests, datetime, sys, argparse, pytz, iso8601
-from config import clientID, clientSecret, apiurl, deactivate_num_days, moveToGroupName, moveToGroupID
+import os, os.path
+
+from config import clientID, clientSecret, apiurl, deactivate_num_days, moveToGroupName, api_keys_path
 
 ###############################################################################
 
@@ -18,43 +20,47 @@ from config import clientID, clientSecret, apiurl, deactivate_num_days, moveToGr
 # Please edit these values in the config.auth.  You can find these information
 # from HALO "[Site Administration] -> [API Keys]" page
 
-if len(clientID) == 8 and len(clientSecret) == 32:
-    api_key_id = clientID
-    api_secret_key = clientSecret
-    api_request_url = apiurl
-else:
-    print "NO API KEY CONFIGRED!"
-    print "Please configure API Key in config.py"
-    print "Exiting..."
-    sys.exit(1)
+
+api_request_url = apiurl
+user_credential_b64 = ''
+headers = {}
+moveToGroupName = moveToGroupName
+api_key_loop_counter = 0
+PATH = api_keys_path
 
 if not (moveToGroupName or moveToGroupID):
     print "NO GROUP TO MOVE TO CONFIGRED!"
     print "Please configure destination group in config.py"
     print "Exiting..."
     sys.exit(1)
+
 ###############################################################################
 # Other variables
-client_credential = api_key_id + ":" + api_secret_key
-user_credential_b64 = "Basic " + base64.b64encode(client_credential)
+#client_credential = api_key_id + ":" + api_secret_key
+#user_credential_b64 = "Basic " + base64.b64encode(client_credential)
 
 ###############################################################################
 
 ###############################################################################
 # Define Methods
 
+# Calls get_access_token and takes returned token value to Create
+# request headers
 def get_headers():
     # Create headers
     reply = get_access_token(api_request_url, "/oauth/access_token?grant_type=client_credentials",
                              {"Authorization": user_credential_b64})
     reply_clean = reply.encode('utf-8')
     headers = {"Content-type": "application/json", "Authorization": "Bearer " + reply_clean}
+    #print headers
     return headers
 
+# Request Bearer token and return access_token
 def get_access_token(url, query_string, headers):
     reply = requests.post(url + query_string, headers=headers)
     return reply.json()["access_token"]
 
+# Uses requests PUT command to send json to move group via API call
 def move_group(host_id,group_id):
     data = { "server": {"group_id": group_id}}
     status_code = str("404")
@@ -94,12 +100,12 @@ def get_group_id(groupName):
         print "More than 1 group matched group name"
         print "Please specify unique group name"
         print "Exiting..."
-        sys.exit(1)
+        return
     else:
         print "Group name match not found"
         print "Please check group name or API Key scope"
         print "Exiting..."
-        sys.exit(1)
+        return
 
 # check for defined groupID to move servers to
 # if not groupID specified in config file, then
@@ -128,8 +134,8 @@ def move_deactivated_servers():
 
     # Check for defined groupID to move servers to
     #print "Move to Group ID: %s" % moveToGroupID
-    newgroupID = check_group_id()
-
+    #newgroupID = check_group_id()
+    newgroupID = str(get_group_id(moveToGroupName))
     # How many days should a server be offline before being moved?
     deactivate_days = deactivate_num_days
 
@@ -179,18 +185,32 @@ def move_deactivated_servers():
                     servers_ignored += 1
 
     #Print summary of script actions
-    print "\n********Script Summary********"
+    print "\n****** Script Summary API Key #%d ******" % api_key_loop_counter
     print "Servers moved: %d" % servers_moved
     print "Servers ignored, less than specified days deactivated: %d " % servers_ignored
     print "Servers already in deactivated group: %d" % servers_previously_moved
     current_date_time = datetime.datetime.utcnow()
     print "Script completed: %s UTC" % current_date_time
-    print "********************************"
+    print "***************************************"
 ###############################################################################
-
+# end of function definitions, begin inline code
 
 #---MAIN---------------------------------------------------------------------
+# Reads in api_keys.txt file and loops through all available Keys
+# and runs get_headers and move_deactivated_servers for each provided
+# base64 keypair
 
-
-headers=get_headers()
-move_deactivated_servers()
+if os.path.isfile(PATH) and os.access(PATH, os.R_OK):
+    print "api_keys.txt file exists and is readable"
+    with open('api_keys.txt') as f:
+        content = f.readlines()
+        f.close()
+        for apiKey in content:
+            #print apiKey
+            user_credential_b64 = "Basic " + base64.b64encode(apiKey[:41])
+            #print user_credential_b64
+            api_key_loop_counter += 1
+            headers=get_headers()
+            move_deactivated_servers()
+else:
+    print "api_keys.txt file either file is missing or is not readable"
