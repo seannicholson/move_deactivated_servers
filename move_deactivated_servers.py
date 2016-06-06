@@ -10,7 +10,7 @@
 import json, base64, requests, datetime, sys, argparse, pytz, iso8601
 import os, os.path
 
-from config import clientID, clientSecret, apiurl, deactivate_num_days, moveToGroupName, api_keys_path
+from config import apiurl, deactivate_num_days, moveToGroupName, api_keys_path
 
 ###############################################################################
 
